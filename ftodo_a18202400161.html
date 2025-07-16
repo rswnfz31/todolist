@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <title>To Do List</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    body {
+      padding: 20px;
+    }
+    .left-col {
+      border: 1px solid #ccc;
+      height: 100%;
+    }
+    .form-section {
+      border: 1px solid #ccc;
+      padding: 20px;
+    }
+    .table td, .table th {
+      vertical-align: middle;
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <div class="row">
+    <!-- Kolom Kiri -->
+    <div class="col-md-4 left-col">
+      <h5>Deskripsi program to do list</h5>
+      <p>Program ini memungkinkan pengguna untuk menambahkan, menyelesaikan, mengedit, dan menghapus daftar tugas.</p>
+    </div>
+
+    <!-- Kolom Kanan -->
+    <div class="col-md-8 form-section">
+      <form id="todoForm" class="mb-4">
+        <div class="mb-3">
+          <label for="todoName" class="form-label">Nama kegiatan:</label>
+          <input type="text" class="form-control" id="todoName" required>
+        </div>
+        <div class="mb-3">
+          <label for="todoDate" class="form-label">Tanggal kegiatan:</label>
+          <input type="date" class="form-control" id="todoDate" required>
+        </div>
+        <button type="submit" class="btn btn-primary">Simpan</button>
+      </form>
+
+      <table class="table table-bordered">
+        <thead>
+          <tr>
+            <th>Nomor</th>
+            <th>Nama Kegiatan</th>
+            <th>Tanggal</th>
+            <th>Selesai</th>
+            <th>Aksi</th>
+          </tr>
+        </thead>
+        <tbody id="todoTableBody">
+          <!-- Data akan ditambahkan lewat JavaScript -->
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<script>
+  let todos = [];
+  let editIndex = null;
+
+  function renderTable() {
+    const tableBody = document.getElementById("todoTableBody");
+    tableBody.innerHTML = "";
+
+    todos.forEach((todo, index) => {
+      const row = document.createElement("tr");
+
+      row.innerHTML = `
+        <td>${index + 1}</td>
+        <td>${todo.name}</td>
+        <td>${new Date(todo.date).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })}</td>
+        <td><input type="checkbox" ${todo.done ? 'checked' : ''} onchange="toggleDone(${index})"></td>
+        <td>
+          <a href="#" onclick="editTodo(${index})">Edit</a> |
+          <a href="#" onclick="deleteTodo(${index})">Hapus</a>
+        </td>
+      `;
+      tableBody.appendChild(row);
+    });
+  }
+
+  function toggleDone(index) {
+    todos[index].done = !todos[index].done;
+    renderTable();
+  }
+
+  function editTodo(index) {
+    document.getElementById("todoName").value = todos[index].name;
+    document.getElementById("todoDate").value = todos[index].date;
+    editIndex = index;
+  }
+
+  function deleteTodo(index) {
+    todos.splice(index, 1);
+    renderTable();
+  }
+
+  document.getElementById("todoForm").addEventListener("submit", function(event) {
+    event.preventDefault();
+
+    const name = document.getElementById("todoName").value;
+    const date = document.getElementById("todoDate").value;
+
+    if (editIndex !== null) {
+      todos[editIndex] = { name, date, done: false };
+      editIndex = null;
+    } else {
+      todos.push({ name, date, done: false });
+    }
+
+    this.reset();
+    renderTable();
+  });
+</script>
+
+</body>
+</html>
